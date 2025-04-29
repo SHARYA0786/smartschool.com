@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl"> <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All-in-One School Management System – Urdu AI Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400..700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Custom styles for body and text direction */
+        body {
+            font-family: 'Roboto', sans-serif; /* Default font */
+            direction: rtl; /* Default direction for Urdu */
+            text-align: right; /* Default text alignment for Urdu */
+            background: linear-gradient(to bottom right, #a7f3d0, #6ee7b7); /* Gradient background */
+            min-height: 100vh;
+        }
+        .english-text {
+            font-family: 'Roboto', sans-serif;
+            direction: ltr;
+            text-align: left;
+        }
+        .urdu-text {
+            font-family: 'Noto Nastaliq Urdu', serif;
+            direction: rtl;
+            text-align: right;
+        }
+        /* Section display control */
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .section.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: #000;
+            text-decoration: none;
+        }
+
+        /* Glassmorphism Card Style */
+        .glass-card {
+            background-color: rgba(255, 255, 255, 0.3); /* White with transparency */
+            backdrop-filter: blur(10px); /* Apply blur */
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+        /* Tab Styling */
+        .tab-button {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.3s ease-in-out;
+        }
+        .tab-button.active {
+            border-color: #10b981; /* Emerald 500 */
+            font-weight: bold;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 95%;
+            }
+            .glass-card {
+                padding: 15px;
+            }
+            .tab-button {
+                padding: 8px 10px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body class="p-4">
+
+    <div id="login-section" class="section active flex items-center justify-center min-h-screen english-text">
+        <div class="glass-card p-8 rounded-lg w-full max-w-sm urdu-text">
+            <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">اسمارٹ اسکول پورٹل</h2>
+            <h2 class="text-2xl font-bold mb-6 text-center english-text text-gray-800">Smart School Portal</h2>
+
+             <div class="flex justify-center mb-6">
+                <button id="lang-toggle" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded-full text-sm">
+                    English / اردو
+                </button>
+            </div>
+
+            <div class="mb-4">
+                <label for="role-select" class="block text-gray-800 text-sm font-bold mb-2">اپنا کردار منتخب کریں / Select Your Role:</label>
+                <select id="role-select" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline urdu-text english-text bg-white bg-opacity-50">
+                    <option value="">منتخب کریں / Select</option>
+                    <option value="admin">ایڈمن / Admin</option>
+                    <option value="accountant">اکاؤنٹنٹ / Accountant</option>
+                    <option value="teacher">استاد / Teacher</option>
+                    <option value="student">طالب علم / Student</option>
+                    <option value="parent">والدین / Parent</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="email" class="block text-gray-800 text-sm font-bold mb-2">ای میل / Email:</label>
+                <input type="email" id="email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline english-text bg-white bg-opacity-50" placeholder="ای میل / Email">
+            </div>
+            <div class="mb-6">
+                <label for="password" class="block text-gray-800 text-sm font-bold mb-2">پاس ورڈ / Password:</label>
+                <input type="password" id="password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline english-text bg-white bg-opacity-50" placeholder="پاس ورڈ / Password">
+            </div>
+            <div class="flex items-center justify-between">
+                <button id="login-button" class="bg-emerald-500 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full transition duration-300 ease-in-out transform hover:scale-105">
+                    لاگ ان / Login
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-container" class="hidden container mx-auto p-4 urdu-text">
+        <header class="flex justify-between items-center mb-6 pb-4 border-b border-gray-300">
+            <h1 id="dashboard-title" class="text-2xl font-bold text-gray-800">ڈیش بورڈ / Dashboard</h1>
+            <button id="logout-button" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:scale-105">
+                لاگ آؤٹ / Logout
+            </button>
+        </header>
+
+        <nav id="main-nav" class="flex flex-wrap justify-center mb-6 border-b border-gray-300">
+            </nav>
+
+        <main id="content-area">
+            <div id="admin-dashboard" class="section p-6 glass-card">
+                <h3 class="text-xl font-bold mb-4">ایڈمن ڈیش بورڈ / Admin Dashboard</h3>
+                <p>یہ ایڈمن ڈیش بورڈ کا مواد ہے۔ یہاں یوزر مینجمنٹ، رولز، سکول سیٹنگز اور رپورٹنگ کی سہولیات ہوں گی۔</p>
+                <p class="english-text">This is the content for the Admin Dashboard. It will contain user management, roles, school settings, and reporting features.</p>
+
+                <div class="mt-6">
+                    <h4 class="text-lg font-semibold mb-3">یوزر مینجمنٹ / User Management</h4>
+                    <button class="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded mr-2">نیا یوزر بنائیں / Create New User</button>
+                    <button class="bg-yellow-500 hover:bg-yellow-700 text-white py-2 px-4 rounded">رولز اسائن کریں / Assign Roles</button>
+                    <div class="mt-4 p-4 bg-white bg-opacity-50 rounded">
+                        <h5 class="font-medium mb-2">یوزرز کی فہرست / List of Users (Dummy)</h5>
+                        <ul>
+                            <li>ایڈمن (Admin)</li>
+                            <li>استاد (Teacher)</li>
+                            <li>طالب علم (Student)</li>
+                            <li>والدین (Parent)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div id="accountant-panel" class="section p-6 glass-card">
+                <h3 class="text-xl font-bold mb-4">اکاؤنٹنٹ پینل / Accountant Panel</h3>
+                <p>یہ اکاؤنٹنٹ پینل کا مواد ہے۔ یہاں فیس اسٹرکچر، ادائیگیاں اور ریپورٹس کی سہولیات ہوں گی۔</p>
+                <p class="english-text">This is the content for the Accountant Panel. It will contain fee structure, payments, and reporting features.</p>
+                 <div class="mt-6">
+                     <button class="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded" onclick="showTab('fee-management')">فیس مینجمنٹ دیکھیں / View Fee Management</button>
+                </div>
+            </div>
+
+            <div id="teacher-panel" class="section p-6 glass-card">
+                <h3 class="text-xl font-bold mb-4">استاد پینل / Teacher Panel</h3>
+                <p>یہ استاد پینل کا مواد ہے۔ یہاں حاضری، اسائنمنٹس اور رزلٹ مینج کرنے کی سہولیات ہوں گی۔</p>
+                <p class="english-text">This is the content for the Teacher Panel. It will contain features for managing attendance, assignments, and results.</p>
+                 <div class="mt-6">
+                     <h4 class="text-lg font-semibold mb-3">حاضری / Attendance</h4>
+                     <div class="p-4 bg-white bg-opacity-50 rounded mb-4">
+                         <h5 class="font-medium mb-2">کلاس 10 کی حاضری / Class 10 Attendance</h5>
+                         <p>یہاں حاضری مارک کرنے کا فارم ہوگا۔</p>
+                         <p class="english-text">Attendance marking form will be here.</p>
+                     </div>
+
+                     <h4 class="text-lg font-semibold mb-3">نتائج اپلوڈ کریں / Upload Results</h4>
+                      <div class="p-4 bg-white bg-opacity-50 rounded">
+                         <h5 class="font-medium mb-2">امتحان کے نتائج / Exam Results</h5>
+                         <p>یہاں رزلٹ اپلوڈ کرنے کا فارم ہوگا۔</p>
+                         <p class="english-text">Result upload form will be here.</p>
+                     </div>
+                </div>
+            </div>
+
+            <div id="student-panel" class="section p-6 glass-card">
+                <h3 class="text-xl font-bold mb-4">طالب علم پینل / Student Panel</h3>
+                <p>یہ طالب علم پینل کا مواد ہے۔ یہاں اپنا پروفائل، رزلٹ، ٹائم ٹیبل اور نوٹس دیکھنے کی سہولیات ہوں گی۔</p>
+                <p class="english-text">This is the content for the Student Panel. It will contain features for viewing profile, results, timetable, and notices.</p>
+                 <div class="mt-6">
+                     <h4 class="text-lg font-semibold mb-3">میرے نتائج / My Results</h4>
+                     <div class="p-4 bg-white bg-opacity-50 rounded">
+                         <h5 class="font-medium mb-2">امتحان: فائنل 2024 / Exam: Final 2024</h5>
+                         <p>ریاضی: 85%</p>
+                         <p>سائنس: 90%</p>
+                         <p class="english-text">Math: 85%</p>
+                         <p class="english-text">Science: 90%</p>
+                     </div>
+                </div>
+            </div>
+
+            <div id="parent-panel" class="section p-6 glass-card">
+                <h3 class="text-xl font-bold mb-4">والدین پینل / Parent Panel</h3>
+                <p>یہ والدین پینل کا مواد ہے۔ یہاں بچوں کی حاضری، فیس اور رزلٹ کی معلومات دیکھنے کی سہولیات ہوں گی۔</p>
+                <p class="english-text">This is the content for the Parent Panel. It will contain features for viewing children's attendance, fees, and results.</p>
+                 <div class="mt-6">
+                     <h4 class="text-lg font-semibold mb-3">بچے کی رپورٹ / Child's Report</h4>
+                     <div class="p-4 bg-white bg-opacity-50 rounded">
+                         <h5 class="font-medium mb-2">نام: احمد علی (Dummy)</h5>
+                         <h5 class="english-text font-medium mb-2">Name: Ahmed Ali (Dummy)</h5>
+                         <p>حاضری: 95%</p>
+                         <p>فیس اسٹیٹس: ادا شدہ</p>
+                         <p>آخری رزلٹ: 88%</p>
+                         <p class="english-text">Attendance: 95%</p>
+                         <p class="english-text">Fee Status: Paid</p>
+                         <p class="english-text">Last Result: 88%</p>
+                     </div>
+                </div>
+            </div>
+
+            <div id="fee-management" class="section p-6 glass-card">
+                <h3 class="text-xl font-bold mb-4">فیس مینجمنٹ ماڈیول / Fee Management Module</h3>
+                <p>یہ فیس مینجمنٹ ماڈیول کا مواد ہے۔ یہاں فیس چالان، آن لائن ادائیگی (ڈمی) اور رپورٹس کی سہولیات ہوں گی۔</p>
+                <p class="english-text">This is the content for the Fee Management Module. It will contain features for fee challans, online payments (dummy), and reports.</p>
+                 <div class="mt-6 p-4 bg-white bg-opacity-50 rounded">
+                    <h4 class="text-lg font-semibold mb-3">نیا فیس چالان بنائیں / Create New Fee Challan</h4>
+                    <p>یہاں فیس چالان بنانے کا فارم ہوگا۔</p>
+                    <p class="english-text">Form to create fee challans will be here.</p>
+                </div>
+            </div>
+
+            <div id="transport-module" class="section p-6 glass-card">
+                <h3 class="text-xl font-bold mb-4">ٹرانسپورٹ ماڈیول / Transport Module</h3>
+                <p>یہ ٹرانسپورٹ ماڈیول کا مواد ہے۔ یہاں طلباء کی روٹس اور ڈرائیورز کی تفصیلات ہوں گی۔</p>
+                <p class="english-text">This is the content for the Transport Module. It will contain features for student routes and driver details.</p>
+                 <div class="mt-6 p-4 bg-white bg-opacity-50 rounded">
+                    <h4 class="text-lg font-semibold mb-3">روٹس اور ڈرائیورز / Routes and Drivers</h4>
+                    <p>روٹ 1: ڈرائیور علی (Dummy)</p>
+                     <p class="english-text">Route 1: Driver Ali (Dummy)</p>
+                    <p>GPS لوکیشن ڈمی فیچر یہاں ہوگا۔</p>
+                    <p class="english-text">Dummy GPS location feature will be here.</p>
+                </div>
+            </div>
+
+            <div id="examination-module" class="section p-6 glass-card">
+                <h3 class="text-xl font-bold mb-4">امتحانات ماڈیول / Examination Module</h3>
+                <p>یہ امتحانات ماڈیول کا مواد ہے۔ یہاں پیپر اسائنمنٹ، رزلٹ انٹری اور گرافیکل رپورٹس کی سہولیات ہوں گی۔</p>
+                <p class="english-text">This is the content for the Examination Module. It will contain features for paper assignment, result entry, and graphical reports.</p>
+                 <div class="mt-6 p-4 bg-white bg-opacity-50 rounded">
+                    <h4 class="text-lg font-semibold mb-3">نتائج کا گراف / Results Graph (Dummy)</h4>
+                    <p>یہاں رزلٹ کا گراف (Pie Chart یا Bar Graph) دکھایا جائے گا۔</p>
+                    <p class="english-text">Result graph (Pie Chart or Bar Graph) will be displayed here.</p>
+                    <div class="w-full h-40 bg-gray-300 flex items-center justify-center text-gray-700">
+                        گراف کی جگہ / Graph Placeholder
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <div id="myModal" class="modal">
+        <div class="modal-content urdu-text">
+            <span class="close-button">&times;</span>
+            <p id="modal-message-urdu">یہ ایک ڈمی پیغام ہے۔</p>
+            <p id="modal-message-english" class="english-text"></p>
+        </div>
+    </div>
+
+    <script>
+        // Get elements
+        const loginSection = document.getElementById('login-section');
+        const appContainer = document.getElementById('app-container');
+        const roleSelect = document.getElementById('role-select');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const loginButton = document.getElementById('login-button');
+        const logoutButton = document.getElementById('logout-button');
+        const dashboardTitle = document.getElementById('dashboard-title');
+        const mainNav = document.getElementById('main-nav');
+        const contentArea = document.getElementById('content-area');
+        const sections = contentArea.querySelectorAll('.section'); // Get all content sections
+        const modal = document.getElementById('myModal');
+        const modalMessageUrdu = document.getElementById('modal-message-urdu');
+        const modalMessageEnglish = document.getElementById('modal-message-english');
+        const closeButton = document.querySelector('.close-button');
+        const langToggle = document.getElementById('lang-toggle');
+        const htmlElement = document.documentElement; // Get the html element
+
+        let currentLang = 'ur'; // Default language
+
+        // Dummy User Data (Stored in localStorage)
+        // In a real app, this would come from a backend
+        const dummyUsers = {
+            'admin@school.com': { password: 'password', role: 'admin' },
+            'teacher@school.com': { password: 'password', role: 'teacher' },
+            'student@school.com': { password: 'password', role: 'student' },
+            'parent@school.com': { password: 'password', role: 'parent' },
+            'accountant@school.com': { password: 'password', role: 'accountant' }
+        };
+
+        // Dummy Data for Modules (Stored in localStorage)
+        const dummyData = {
+            results: {
+                'student@school.com': [
+                    { exam: 'Final 2024', subject: 'Math', grade: 'A', percentage: 85 },
+                    { exam: 'Final 2024', subject: 'Science', grade: 'A+', percentage: 90 }
+                ]
+            },
+            attendance: {
+                 'student@school.com': { totalDays: 180, presentDays: 171, percentage: 95 }
+            },
+            fees: {
+                 'student@school.com': { totalFee: 50000, paidFee: 50000, status: 'Paid' }
+            },
+            transport: {
+                 'student@school.com': { route: 'Route 1', driver: 'Ali', gpsLink: '#' } // Dummy link
+            }
+        };
+
+        // Load dummy data into localStorage if not already present
+        if (!localStorage.getItem('dummyUsers')) {
+            localStorage.setItem('dummyUsers', JSON.stringify(dummyUsers));
+        }
+         if (!localStorage.getItem('dummyData')) {
+            localStorage.setItem('dummyData', JSON.stringify(dummyData));
+        }
+
+
+        // --- Language Toggle Logic ---
+        langToggle.addEventListener('click', () => {
+            if (currentLang === 'ur') {
+                htmlElement.lang = 'en';
+                htmlElement.dir = 'ltr';
+                document.body.classList.remove('urdu-text');
+                document.body.classList.add('english-text');
+                currentLang = 'en';
+                langToggle.textContent = 'اردو / English';
+            } else {
+                htmlElement.lang = 'ur';
+                htmlElement.dir = 'rtl';
+                document.body.classList.remove('english-text');
+                document.body.classList.add('urdu-text');
+                currentLang = 'ur';
+                 langToggle.textContent = 'English / اردو';
+            }
+            // Update modal message direction/text if open
+            if (modal.style.display === 'flex') {
+                 // Re-set text content to update direction if needed
+                 const urduText = modalMessageUrdu.textContent;
+                 const englishText = modalMessageEnglish.textContent;
+                 modalMessageUrdu.textContent = urduText;
+                 modalMessageEnglish.textContent = englishText;
+            }
+             updateDashboardTitle(localStorage.getItem('loggedInRole')); // Update title on language change
+             populateNavTabs(localStorage.getItem('loggedInRole')); // Repopulate tabs with correct language
+             updateContentLanguage(); // Update content within sections
+        });
+
+        // Function to update content language within sections
+        function updateContentLanguage() {
+            sections.forEach(section => {
+                const urduElements = section.querySelectorAll('.urdu-text');
+                const englishElements = section.querySelectorAll('.english-text');
+
+                if (currentLang === 'ur') {
+                     urduElements.forEach(el => el.classList.remove('hidden'));
+                     englishElements.forEach(el => el.classList.add('hidden'));
+                } else {
+                     urduElements.forEach(el => el.classList.add('hidden'));
+                     englishElements.forEach(el => el.classList.remove('hidden'));
+                }
+            });
+        }
+
+
+        // --- Section and Modal Control ---
+
+        // Function to show a specific section
+        function showSection(sectionId) {
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            const activeSection = document.getElementById(sectionId);
+            if (activeSection) {
+                activeSection.classList.add('active');
+                updateContentLanguage(); // Ensure content language is correct
+            }
+        }
+
+        // Function to show the modal with a message
+        function showModal(messageUrdu, messageEnglish = '') {
+            modalMessageUrdu.textContent = messageUrdu;
+            modalMessageEnglish.textContent = messageEnglish;
+            modalMessageEnglish.classList.toggle('hidden', messageEnglish === ''); // Hide English if empty
+            modal.style.display = 'flex'; // Use flex to center
+             updateContentLanguage(); // Ensure modal language is correct
+        }
+
+        // Function to hide the modal
+        function hideModal() {
+            modal.style.display = 'none';
+        }
+
+        // Close modal when clicking the close button
+        closeButton.addEventListener('click', hideModal);
+
+        // Close modal when clicking outside the modal content
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                hideModal();
+            }
+        });
+
+        // --- Navigation and Role-based Access ---
+
+        // Define navigation tabs for each role
+        const roleTabs = {
+            admin: [
+                { id: 'admin-dashboard', textUrdu: 'ایڈمن ڈیش بورڈ', textEnglish: 'Admin Dashboard' },
+                { id: 'fee-management', textUrdu: 'فیس مینجمنٹ', textEnglish: 'Fee Management' },
+                { id: 'transport-module', textUrdu: 'ٹرانسپورٹ', textEnglish: 'Transport' },
+                { id: 'examination-module', textUrdu: 'امتحانات', textEnglish: 'Examinations' }
+            ],
+            accountant: [
+                 { id: 'accountant-panel', textUrdu: 'اکاؤنٹنٹ پینل', textEnglish: 'Accountant Panel' },
+                 { id: 'fee-management', textUrdu: 'فیس مینجمنٹ', textEnglish: 'Fee Management' }
+            ],
+            teacher: [
+                 { id: 'teacher-panel', textUrdu: 'استاد پینل', textEnglish: 'Teacher Panel' },
+                 { id: 'examination-module', textUrdu: 'امتحانات', textEnglish: 'Examinations' }
+            ],
+            student: [
+                 { id: 'student-panel', textUrdu: 'طالب علم پینل', textEnglish: 'Student Panel' },
+                 { id: 'fee-management', textUrdu: 'فیس اسٹیٹس', textEnglish: 'Fee Status' }, // Student views fee status
+                 { id: 'transport-module', textUrdu: 'ٹرانسپورٹ', textEnglish: 'Transport' } // Student views transport
+            ],
+            parent: [
+                 { id: 'parent-panel', textUrdu: 'والدین پینل', textEnglish: 'Parent Panel' },
+                 { id: 'fee-management', textUrdu: 'فیس اسٹیٹس', textEnglish: 'Fee Status' }, // Parent views fee status
+                 { id: 'transport-module', textUrdu: 'ٹرانسپورٹ', textEnglish: 'Transport' } // Parent views transport
+            ]
+        };
+
+        // Function to populate navigation tabs based on role
+        function populateNavTabs(role) {
+            mainNav.innerHTML = ''; // Clear existing tabs
+            const tabs = roleTabs[role];
+            if (tabs) {
+                tabs.forEach(tab => {
+                    const button = document.createElement('button');
+                    button.id = `tab-${tab.id}`;
+                    button.classList.add('tab-button', 'mx-2', 'mb-2', 'text-gray-700', 'hover:text-emerald-600', 'transition');
+                     button.innerHTML = `<span class="urdu-text">${tab.textUrdu}</span> / <span class="english-text">${tab.textEnglish}</span>`;
+                    button.addEventListener('click', () => showTab(tab.id));
+                    mainNav.appendChild(button);
+                });
+            }
+        }
+
+        // Function to handle tab switching
+        function showTab(tabId) {
+            // Deactivate all tab buttons
+            mainNav.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Activate the clicked tab button
+            const activeTabButton = document.getElementById(`tab-${tabId}`);
+            if (activeTabButton) {
+                activeTabButton.classList.add('active');
+            }
+
+            // Show the corresponding section
+            showSection(tabId);
+        }
+
+        // Function to update dashboard title based on role
+        function updateDashboardTitle(role) {
+            let titleUrdu = 'ڈیش بورڈ';
+            let titleEnglish = 'Dashboard';
+            switch(role) {
+                case 'admin': titleUrdu = 'ایڈمن ڈیش بورڈ'; titleEnglish = 'Admin Dashboard'; break;
+                case 'accountant': titleUrdu = 'اکاؤنٹنٹ پینل'; titleEnglish = 'Accountant Panel'; break;
+                case 'teacher': titleUrdu = 'استاد پینل'; titleEnglish = 'Teacher Panel'; break;
+                case 'student': titleUrdu = 'طالب علم پینل'; titleEnglish = 'Student Panel'; break;
+                case 'parent': titleUrdu = 'والدین پینل'; titleEnglish = 'Parent Panel'; break;
+            }
+             dashboardTitle.innerHTML = `<span class="urdu-text">${titleUrdu}</span> / <span class="english-text">${titleEnglish}</span>`;
+             updateContentLanguage(); // Ensure title language is correct
+        }
+
+
+        // --- Login/Logout Logic ---
+
+        loginButton.addEventListener('click', () => {
+            const selectedRole = roleSelect.value;
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            if (selectedRole === "") {
+                showModal("براہ کرم اپنا کردار منتخب کریں", "Please select your role.");
+                return;
+            }
+            if (email === "" || password === "") {
+                 showModal("براہ کرم ای میل اور پاس ورڈ درج کریں", "Please enter email and password.");
+                 return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('dummyUsers'));
+            const user = users[email];
+
+            if (user && user.password === password && user.role === selectedRole) {
+                // Successful Login
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('loggedInRole', selectedRole);
+                localStorage.setItem('loggedInUserEmail', email); // Store logged-in user's email
+
+                loginSection.classList.remove('active');
+                loginSection.classList.add('hidden'); // Hide login section completely
+                appContainer.classList.remove('hidden'); // Show app container
+
+                updateDashboardTitle(selectedRole);
+                populateNavTabs(selectedRole);
+
+                // Show the first tab for the logged-in role
+                const firstTabId = roleTabs[selectedRole][0]?.id;
+                if (firstTabId) {
+                    showTab(firstTabId);
+                } else {
+                     // Fallback if no tabs defined (shouldn't happen with current roles)
+                     showModal("ڈیش بورڈ لوڈ کرنے میں ناکام", "Failed to load dashboard.");
+                     logout(); // Go back to login
+                }
+
+            } else {
+                // Failed Login
+                showModal("غلط ای میل، پاس ورڈ یا کردار", "Invalid email, password, or role.");
+            }
+        });
+
+        logoutButton.addEventListener('click', logout);
+
+        function logout() {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('loggedInRole');
+            localStorage.removeItem('loggedInUserEmail');
+
+            appContainer.classList.add('hidden'); // Hide app container
+            loginSection.classList.remove('hidden'); // Show login section
+            showSection('login-section'); // Ensure login section is active
+
+            // Clear input fields
+            emailInput.value = '';
+            passwordInput.value = '';
+            roleSelect.value = '';
+
+            // Reset language to default on logout (optional, depends on preference)
+            // htmlElement.lang = 'ur';
+            // htmlElement.dir = 'rtl';
+            // document.body.classList.remove('english-text');
+            // document.body.classList.add('urdu-text');
+            // currentLang = 'ur';
+            // langToggle.textContent = 'English / اردو';
+        }
+
+        // --- Initial Load ---
+        // Check if user is already logged in on page load
+        window.onload = () => {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            const loggedInRole = localStorage.getItem('loggedInRole');
+
+            if (isLoggedIn === 'true' && loggedInRole) {
+                loginSection.classList.add('hidden'); // Hide login section
+                appContainer.classList.remove('hidden'); // Show app container
+
+                updateDashboardTitle(loggedInRole);
+                populateNavTabs(loggedInRole);
+
+                // Show the first tab for the logged-in role
+                 const firstTabId = roleTabs[loggedInRole][0]?.id;
+                if (firstTabId) {
+                    showTab(firstTabId);
+                } else {
+                     // Fallback if no tabs defined
+                     showModal("ڈیش بورڈ لوڈ کرنے میں ناکام", "Failed to load dashboard.");
+                     logout(); // Go back to login
+                }
+
+            } else {
+                // Not logged in, show login section
+                showSection('login-section');
+                 appContainer.classList.add('hidden'); // Ensure app container is hidden
+            }
+             updateContentLanguage(); // Ensure initial language is correct
+        };
+
+         // --- Dummy Data Display Functions (Implement these to show data in panels) ---
+         // You would call these functions when the respective tab/section is shown
+
+        function displayStudentResults(email) {
+             const data = JSON.parse(localStorage.getItem('dummyData'));
+             const results = data.results[email] || [];
+             const resultsDiv = document.querySelector('#student-panel .p-4.bg-white.bg-opacity-50.rounded'); // Find the dummy results div
+
+             if (resultsDiv) {
+                 let html = `<h5 class="font-medium mb-2 urdu-text">میرے نتائج</h5><h5 class="font-medium mb-2 english-text hidden">My Results</h5>`;
+                 if (results.length > 0) {
+                     results.forEach(res => {
+                         html += `<p class="urdu-text">امتحان: ${res.exam}، مضمون: ${res.subject}، گریڈ: ${res.grade}، فیصد: ${res.percentage}%</p>`;
+                         html += `<p class="english-text hidden">Exam: ${res.exam}, Subject: ${res.subject}, Grade: ${res.grade}, Percentage: ${res.percentage}%</p>`;
+                     });
+                 } else {
+                     html += `<p class="urdu-text">کوئی نتیجہ دستیاب نہیں ہے۔</p><p class="english-text hidden">No results available.</p>`;
+                 }
+                 resultsDiv.innerHTML = html;
+                 updateContentLanguage(); // Update language after injecting HTML
+             }
+        }
+
+        function displayParentChildReport(email) {
+            // In a real app, a parent email would be linked to child emails
+            // Here, we'll just use the dummy student data for demonstration
+             const data = JSON.parse(localStorage.getItem('dummyData'));
+             const studentEmail = 'student@school.com'; // Assuming parent is linked to this dummy student
+             const attendance = data.attendance[studentEmail];
+             const fees = data.fees[studentEmail];
+             const results = data.results[studentEmail]; // Get results for the child
+
+             const reportDiv = document.querySelector('#parent-panel .p-4.bg-white.bg-opacity-50.rounded'); // Find the dummy report div
+
+             if (reportDiv) {
+                 let html = `<h4 class="text-lg font-semibold mb-3 urdu-text">بچے کی رپورٹ</h4><h4 class="text-lg font-semibold mb-3 english-text hidden">Child's Report</h4>`;
+                 html += `<h5 class="font-medium mb-2 urdu-text">نام: احمد علی (Dummy)</h5>`;
+                 html += `<h5 class="font-medium mb-2 english-text hidden">Name: Ahmed Ali (Dummy)</h5>`;
+
+                 if (attendance) {
+                     html += `<p class="urdu-text">حاضری: ${attendance.percentage}%</p>`;
+                     html += `<p class="english-text hidden">Attendance: ${attendance.percentage}%</p>`;
+                 }
+                 if (fees) {
+                      html += `<p class="urdu-text">فیس اسٹیٹس: ${fees.status === 'Paid' ? 'ادا شدہ' : 'غیر ادا شدہ'}</p>`;
+                      html += `<p class="english-text hidden">Fee Status: ${fees.status}</p>`;
+                 }
+                 if (results && results.length > 0) {
+                      html += `<p class="urdu-text">آخری امتحان: ${results[0].exam}، فیصد: ${results.reduce((sum, res) => sum + res.percentage, 0) / results.length}%</p>`; // Simple average
+                      html += `<p class="english-text hidden">Last Exam: ${results[0].exam}, Percentage: ${results.reduce((sum, res) => sum + res.percentage, 0) / results.length}%</p>`;
+                 } else {
+                     html += `<p class="urdu-text">کوئی رزلٹ دستیاب نہیں ہے۔</p><p class="english-text hidden">No results available.</p>`;
+                 }
+
+                 reportDiv.innerHTML = html;
+                 updateContentLanguage(); // Update language after injecting HTML
+             }
+        }
+
+        // Add more display functions for other modules/panels as needed
+        // Call these functions within the showTab function based on the tabId
+
+        // Example: Modify showTab to call display functions
+        const originalShowTab = showTab;
+        showTab = (tabId) => {
+            originalShowTab(tabId); // Call the original function first
+
+            // Call specific display functions based on the tabId and logged-in role
+            const loggedInRole = localStorage.getItem('loggedInRole');
+            const loggedInUserEmail = localStorage.getItem('loggedInUserEmail');
+
+            if (loggedInRole === 'student' && tabId === 'student-panel') {
+                displayStudentResults(loggedInUserEmail);
+            }
+            if (loggedInRole === 'parent' && tabId === 'parent-panel') {
+                 displayParentChildReport(loggedInUserEmail);
+            }
+            // Add conditions for other modules/panels and roles
+        };
+
+    </script>
+
+</body>
+</html>
